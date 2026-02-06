@@ -38,6 +38,8 @@ class SessionRepository {
 
   async update(id: string, data: Partial<{
     title: string;
+    emoji: string;
+    description: string;
     metadata: Record<string, any>;
     isActive: boolean;
     lastMessageAt: Date;

@@ -139,6 +139,18 @@ class MessageProcessor {
       // Update session's last message timestamp
       await this.sessionRepository.updateLastMessageAt(sessionId);
 
+      // Generate session metadata if not already set (after 2+ messages)
+      const messageCount = await this.messageRepository.countBySession(sessionId);
+      if (messageCount >= 4) { // 2 user + 2 assistant messages
+        const session = await this.sessionRepository.findById(sessionId);
+        if (session && !session.title?.includes('New conversation')) {
+          // Already has a custom title, skip generation
+        } else {
+          // Generate title, description, and emoji
+          await this.generateSessionMetadata(sessionId, userId, agent.model, apiKey);
+        }
+      }
+
       return {
         response: assistantMessage,
         model: response.model,
@@ -157,6 +169,59 @@ class MessageProcessor {
         throw new Error(`Failed to process message: ${error.message}`);
       }
       throw new Error('Failed to process message: Unknown error');
+    }
+  }
+
+  private async generateSessionMetadata(
+    sessionId: string,
+    userId: string,
+    model: string,
+    apiKey: string
+  ): Promise<void> {
+    try {
+      // Get conversation history
+      const messages = await this.messageRepository.findBySession(sessionId, 10);
+      
+      // Build conversation summary
+      const conversationText = messages
+        .map(msg => `${msg.role === 'user' ? 'User' : 'Assistant'}: ${msg.content}`)
+        .join('\n');
+
+      // Ask AI to generate metadata
+      const prompt = `Based on this conversation, generate a JSON object with:
+- title: A short, descriptive title (max 50 chars)
+- description: A brief summary (max 100 chars)
+- emoji: A single relevant emoji
+
+Conversation:
+${conversationText}
+
+Respond ONLY with valid JSON in this exact format:
+{"title": "...", "description": "...", "emoji": "..."}`;
+
+      const response = await this.openRouterService.sendMessage(
+        apiKey,
+        model,
+        [{ role: 'user', content: prompt }]
+      );
+
+      const aiResponse = response.choices[0]?.message?.content || '';
+      
+      // Parse JSON response
+      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const metadata = JSON.parse(jsonMatch[0]);
+        
+        // Update session with generated metadata
+        await this.sessionRepository.update(sessionId, {
+          title: metadata.title || 'Conversation',
+          description: metadata.description || '',
+          emoji: metadata.emoji || '💬'
+        });
+      }
+    } catch (error) {
+      // Silently fail - metadata generation is not critical
+      console.error('Failed to generate session metadata:', error);
     }
   }
 }

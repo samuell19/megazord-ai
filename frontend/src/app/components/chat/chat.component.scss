@@ -72,15 +72,18 @@
     margin-bottom: 24px;
     padding: 16px 20px;
     border-radius: 4px;
+    max-width: 75%;
 
     &.user {
-      background: rgba(0, 100, 255, 0.1);
-      border-left: 3px solid #0064ff;
+      background: rgba(0, 100, 255, 0.15);
+      border-right: 3px solid #0064ff;
+      margin-left: auto;
     }
 
     &.assistant {
       background: rgba(0, 255, 255, 0.1);
       border-left: 3px solid #00ffff;
+      margin-right: auto;
     }
 
     .message-header {
