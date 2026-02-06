@@ -18,6 +18,33 @@ export interface Agent {
   updatedAt: string;
 }
 
+export interface Session {
+  id: string;
+  agentId: string;
+  userId: string;
+  title?: string;
+  emoji?: string;
+  description?: string;
+  metadata?: Record<string, any>;
+  isActive: boolean;
+  lastMessageAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Message {
+  id: string;
+  sessionId: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  metadata?: Record<string, any>;
+  tokensUsed?: number;
+  processingTimeMs?: number;
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface OpenRouterModel {
   id: string;
   name: string;
@@ -45,7 +72,7 @@ interface AgentListResponse {
 
 interface MessageRequest {
   message: string;
-  conversationHistory?: Array<{ role: string; content: string }>;
+  sessionId?: string;
 }
 
 interface MessageResponse {
@@ -55,7 +82,30 @@ interface MessageResponse {
     response: string;
     model: string;
     tokensUsed?: number;
+    sessionId: string;
+    messageId: string;
   };
+  timestamp: string;
+}
+
+interface SessionResponse {
+  status: number;
+  message: string;
+  data?: Session;
+  timestamp: string;
+}
+
+interface SessionListResponse {
+  status: number;
+  message: string;
+  data?: Session[];
+  timestamp: string;
+}
+
+interface MessageListResponse {
+  status: number;
+  message: string;
+  data?: Message[];
   timestamp: string;
 }
 
@@ -133,4 +183,51 @@ export class AgentService {
       { headers: this.getHeaders() }
     );
   }
+
+  // Session methods
+  createSession(agentId: string, title?: string): Observable<SessionResponse> {
+    return this.http.post<SessionResponse>(
+      `${environment.apiUrl}/sessions`,
+      { agentId, title },
+      { headers: this.getHeaders() }
+    );
+  }
+
+  listSessions(agentId: string): Observable<SessionListResponse> {
+    return this.http.get<SessionListResponse>(
+      `${environment.apiUrl}/sessions/agent/${agentId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getSession(sessionId: string): Observable<SessionResponse> {
+    return this.http.get<SessionResponse>(
+      `${environment.apiUrl}/sessions/${sessionId}`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  getSessionMessages(sessionId: string): Observable<MessageListResponse> {
+    return this.http.get<MessageListResponse>(
+      `${environment.apiUrl}/sessions/${sessionId}/messages`,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  updateSession(sessionId: string, data: { title?: string; isActive?: boolean }): Observable<SessionResponse> {
+    return this.http.put<SessionResponse>(
+      `${environment.apiUrl}/sessions/${sessionId}`,
+      data,
+      { headers: this.getHeaders() }
+    );
+  }
+
+  deleteSession(sessionId: string): Observable<any> {
+    return this.http.delete(
+      `${environment.apiUrl}/sessions/${sessionId}`,
+      { headers: this.getHeaders() }
+    );
+  }
 }
+
+export type { MessageRequest };

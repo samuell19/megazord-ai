@@ -1,0 +1,49 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <button class="btn-back" (click)="goBack()">← BACK</button>
+    <div class="session-info" *ngIf="session && agent">
+      <span class="emoji">{{ session.emoji || '💬' }}</span>
+      <div class="info">
+        <h1>{{ session.title || 'New Conversation' }}</h1>
+        <span class="agent-name">{{ agent.name }}</span>
+      </div>
+    </div>
+    <div class="spacer"></div>
+  </div>
+
+  <div class="messages-area">
+    <div class="message" *ngFor="let msg of messages" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+      <div class="message-header">
+        <span class="role">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</span>
+        <span class="time">{{ msg.createdAt | date: 'short' }}</span>
+      </div>
+      <div class="message-content">{{ msg.content }}</div>
+    </div>
+
+    <div class="loading-message" *ngIf="isSending">
+      <div class="spinner"></div>
+      <span>AI is thinking...</span>
+    </div>
+
+    <div class="empty-state" *ngIf="messages.length === 0 && !isSending">
+      <p>Start your conversation</p>
+    </div>
+  </div>
+
+  <div class="error-banner" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="input-area">
+    <input
+      [(ngModel)]="currentMessage"
+      (keyup.enter)="sendMessage()"
+      placeholder="Type your message..."
+      [disabled]="isSending"
+      class="message-input"
+    />
+    <button (click)="sendMessage()" [disabled]="!currentMessage.trim() || isSending" class="btn-send">
+      SEND
+    </button>
+  </div>
+</div>

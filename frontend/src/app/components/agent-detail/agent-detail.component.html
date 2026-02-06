@@ -1,4 +1,4 @@
-<div class="agent-detail-container">
+<div class="agent-sessions-container">
   <div class="agent-header">
     <div class="header-content">
       <button class="btn-back" routerLink="/dashboard">← BACK</button>
@@ -10,41 +10,54 @@
     </div>
   </div>
 
-  <div class="chat-container">
-    <div class="messages-area">
-      <div class="message" *ngFor="let msg of messages" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
-        <div class="message-header">
-          <span class="role">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</span>
-          <span class="time">{{ msg.timestamp | date: 'short' }}</span>
-        </div>
-        <div class="message-content">{{ msg.content }}</div>
-      </div>
-
-      <div class="loading-message" *ngIf="isSending">
-        <div class="spinner"></div>
-        <span>AI is thinking...</span>
-      </div>
-
-      <div class="empty-state" *ngIf="messages.length === 0 && !isSending">
-        <p>Start a conversation with your AI agent</p>
-      </div>
+  <div class="sessions-content">
+    <div class="sessions-header">
+      <h2>Conversations</h2>
+      <button class="btn-new-session" (click)="createNewSession()">
+        <span class="icon">+</span>
+        NEW CONVERSATION
+      </button>
     </div>
 
     <div class="error-banner" *ngIf="errorMessage">
       {{ errorMessage }}
     </div>
 
-    <div class="input-area">
-      <input
-        [(ngModel)]="currentMessage"
-        (keyup.enter)="sendMessage()"
-        placeholder="Type your message..."
-        [disabled]="isSending"
-        class="message-input"
-      />
-      <button (click)="sendMessage()" [disabled]="!currentMessage.trim() || isSending" class="btn-send">
-        SEND
-      </button>
+    <div class="sessions-grid" *ngIf="!isLoading">
+      <div class="empty-state" *ngIf="sessions.length === 0">
+        <div class="empty-icon">💬</div>
+        <p>No conversations yet</p>
+        <span>Start a new conversation to get started</span>
+      </div>
+
+      <div 
+        *ngFor="let session of sessions"
+        class="session-card"
+        (click)="openSession(session)"
+      >
+        <div class="session-emoji">{{ session.emoji || '💬' }}</div>
+        <div class="session-info">
+          <h3>{{ session.title || 'New Conversation' }}</h3>
+          <p *ngIf="session.description">{{ session.description }}</p>
+          <p *ngIf="!session.description" class="no-description">No description yet</p>
+          <div class="session-meta">
+            <span class="date" *ngIf="session.lastMessageAt">
+              {{ session.lastMessageAt | date: 'short' }}
+            </span>
+            <span class="date" *ngIf="!session.lastMessageAt">
+              {{ session.createdAt | date: 'short' }}
+            </span>
+          </div>
+        </div>
+        <button class="btn-delete-session" (click)="deleteSession(session, $event)" title="Delete session">
+          ×
+        </button>
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="isLoading">
+      <div class="spinner"></div>
+      <span>Loading conversations...</span>
     </div>
   </div>
 </div>

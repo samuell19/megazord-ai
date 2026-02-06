@@ -1,19 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AgentService, Agent } from '../../services/agent.service';
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+import { AgentService, Agent, Session } from '../../services/agent.service';
 
 @Component({
   selector: 'app-agent-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './agent-detail.component.html',
   styleUrls: ['./agent-detail.component.scss']
 })
@@ -23,16 +16,15 @@ export class AgentDetailComponent implements OnInit {
   private agentService = inject(AgentService);
 
   agent: Agent | null = null;
-  messages: Message[] = [];
-  currentMessage: string = '';
+  sessions: Session[] = [];
   isLoading: boolean = true;
-  isSending: boolean = false;
   errorMessage: string = '';
 
   ngOnInit(): void {
     const agentId = this.route.snapshot.paramMap.get('id');
     if (agentId) {
       this.loadAgent(agentId);
+      this.loadSessions(agentId);
     }
   }
 
@@ -49,46 +41,51 @@ export class AgentDetailComponent implements OnInit {
     });
   }
 
-  sendMessage(): void {
-    if (!this.currentMessage.trim() || !this.agent || this.isSending) {
-      return;
-    }
-
-    const userMessage: Message = {
-      role: 'user',
-      content: this.currentMessage,
-      timestamp: new Date()
-    };
-
-    this.messages.push(userMessage);
-    const messageToSend = this.currentMessage;
-    this.currentMessage = '';
-    this.isSending = true;
-    this.errorMessage = '';
-
-    const conversationHistory = this.messages.map(m => ({
-      role: m.role,
-      content: m.content
-    }));
-
-    this.agentService.sendMessage(this.agent.id, {
-      message: messageToSend,
-      conversationHistory: conversationHistory.slice(0, -1) // Exclude the current message
-    }).subscribe({
+  loadSessions(agentId: string): void {
+    this.agentService.listSessions(agentId).subscribe({
       next: (response) => {
-        this.isSending = false;
+        this.sessions = response.data || [];
+      },
+      error: (error) => {
+        console.error('Failed to load sessions', error);
+      }
+    });
+  }
+
+  createNewSession(): void {
+    if (!this.agent) return;
+
+    this.agentService.createSession(this.agent.id).subscribe({
+      next: (response) => {
         if (response.data) {
-          const assistantMessage: Message = {
-            role: 'assistant',
-            content: response.data.response,
-            timestamp: new Date()
-          };
-          this.messages.push(assistantMessage);
+          // Navigate to chat with new session
+          this.router.navigate(['/agents', this.agent!.id, 'chat', response.data.id]);
         }
       },
       error: (error) => {
-        this.isSending = false;
-        this.errorMessage = error.error?.message || 'Failed to send message';
+        this.errorMessage = 'Failed to create session';
+      }
+    });
+  }
+
+  openSession(session: Session): void {
+    if (!this.agent) return;
+    this.router.navigate(['/agents', this.agent.id, 'chat', session.id]);
+  }
+
+  deleteSession(session: Session, event: Event): void {
+    event.stopPropagation();
+    
+    if (!confirm(`Delete session "${session.title || 'New Conversation'}"?`)) {
+      return;
+    }
+
+    this.agentService.deleteSession(session.id).subscribe({
+      next: () => {
+        this.sessions = this.sessions.filter(s => s.id !== session.id);
+      },
+      error: (error) => {
+        this.errorMessage = 'Failed to delete session';
       }
     });
   }

@@ -234,7 +234,7 @@ class AgentController {
   sendMessage = async (req: AuthRequest, res: Response): Promise<Response> => {
     try {
       const { id } = req.params;
-      const { message, conversationHistory } = req.body;
+      const { message, sessionId } = req.body;
       const userId = req.user!.id;
 
       // Input validation
@@ -259,7 +259,7 @@ class AgentController {
       // Process message
       const response = await this.messageProcessor.process(id, userId, {
         message,
-        conversationHistory
+        sessionId
       });
 
       return res.status(200).json({

@@ -5,9 +5,13 @@ import sequelize from './config/database';
 import { initUserModel } from './models/User';
 import ApiKey from './models/ApiKey';
 import Agent from './models/Agent';
+import Session from './models/Session';
+import Message from './models/Message';
+import Attachment from './models/Attachment';
 import authRoutes from './routes/authRoutes';
 import apiKeyRoutes from './routes/apiKeyRoutes';
 import agentRoutes from './routes/agentRoutes';
+import sessionRoutes from './routes/sessionRoutes';
 import errorHandler from './middleware/errorHandler';
 
 dotenv.config();
@@ -16,6 +20,9 @@ dotenv.config();
 const User = initUserModel(sequelize);
 ApiKey.initialize(sequelize);
 Agent.initialize(sequelize);
+Session.initialize(sequelize);
+Message.initialize(sequelize);
+Attachment.initialize(sequelize);
 
 // Setup associations with cascade delete
 User.hasMany(Agent, {
@@ -40,6 +47,65 @@ ApiKey.belongsTo(User, {
   as: 'user'
 });
 
+// Session associations
+Agent.hasMany(Session, {
+  foreignKey: 'agentId',
+  as: 'sessions',
+  onDelete: 'CASCADE'
+});
+
+Session.belongsTo(Agent, {
+  foreignKey: 'agentId',
+  as: 'agent'
+});
+
+User.hasMany(Session, {
+  foreignKey: 'userId',
+  as: 'sessions',
+  onDelete: 'CASCADE'
+});
+
+Session.belongsTo(User, {
+  foreignKey: 'userId',
+  as: 'user'
+});
+
+// Message associations
+Session.hasMany(Message, {
+  foreignKey: 'sessionId',
+  as: 'messages',
+  onDelete: 'CASCADE'
+});
+
+Message.belongsTo(Session, {
+  foreignKey: 'sessionId',
+  as: 'session'
+});
+
+// Self-referencing for message threads/branches
+Message.hasMany(Message, {
+  foreignKey: 'parentMessageId',
+  as: 'replies',
+  onDelete: 'SET NULL'
+});
+
+Message.belongsTo(Message, {
+  foreignKey: 'parentMessageId',
+  as: 'parentMessage'
+});
+
+// Attachment associations
+Message.hasMany(Attachment, {
+  foreignKey: 'messageId',
+  as: 'attachments',
+  onDelete: 'CASCADE'
+});
+
+Attachment.belongsTo(Message, {
+  foreignKey: 'messageId',
+  as: 'message'
+});
+
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
@@ -60,6 +126,7 @@ app.get('/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/api-keys', apiKeyRoutes);
 app.use('/api/agents', agentRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
