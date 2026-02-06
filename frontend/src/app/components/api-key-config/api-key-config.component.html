@@ -1,0 +1,69 @@
+<div class="api-key-container">
+  <div class="api-key-card">
+    <div class="header">
+      <h1>API KEY CONFIGURATION</h1>
+      <p class="subtitle">OPENROUTER API ACCESS</p>
+    </div>
+
+    <div class="existing-key" *ngIf="hasExistingKey && !isLoading">
+      <div class="key-info">
+        <label>CURRENT KEY</label>
+        <div class="masked-key">{{ maskedKey }}</div>
+      </div>
+      <button type="button" class="btn-danger" (click)="onDelete()">
+        DELETE KEY
+      </button>
+    </div>
+
+    <form [formGroup]="apiKeyForm" (ngSubmit)="onSubmit()" class="api-key-form">
+      <div class="form-group">
+        <label for="key">
+          {{ hasExistingKey ? 'NEW API KEY' : 'API KEY' }}
+        </label>
+        <input
+          id="key"
+          type="password"
+          formControlName="key"
+          class="form-control"
+          [class.error]="key?.invalid && key?.touched"
+          placeholder="sk-or-v1-..."
+        />
+        <div class="error-message" *ngIf="key?.invalid && key?.touched">
+          <span *ngIf="key?.errors?.['required']">API key is required</span>
+          <span *ngIf="key?.errors?.['minlength']">API key must be at least 10 characters</span>
+        </div>
+        <div class="help-text">
+          Get your API key from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a>
+        </div>
+      </div>
+
+      <div class="success-message" *ngIf="successMessage">
+        <span>✓ {{ successMessage }}</span>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <div class="button-group">
+        <button
+          type="submit"
+          class="btn-primary"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="!isLoading">{{ hasExistingKey ? 'UPDATE KEY' : 'SAVE KEY' }}</span>
+          <span *ngIf="isLoading">PROCESSING...</span>
+        </button>
+
+        <button
+          type="button"
+          class="btn-secondary"
+          routerLink="/dashboard"
+          [disabled]="isLoading"
+        >
+          BACK TO DASHBOARD
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

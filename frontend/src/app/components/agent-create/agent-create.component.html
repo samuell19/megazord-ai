@@ -1,0 +1,46 @@
+<div class="create-container">
+  <div class="create-card">
+    <h1>CREATE NEW AGENT</h1>
+    
+    <div class="loading" *ngIf="isLoadingModels">Loading models...</div>
+    
+    <form [formGroup]="agentForm" (ngSubmit)="onSubmit()" *ngIf="!isLoadingModels">
+      <div class="form-group">
+        <label>AGENT NAME</label>
+        <input formControlName="name" class="form-control" placeholder="My AI Assistant" />
+        <div class="error" *ngIf="name?.invalid && name?.touched">
+          <span *ngIf="name?.errors?.['required']">Name is required</span>
+          <span *ngIf="name?.errors?.['minlength']">Name must be at least 3 characters</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>MODEL</label>
+        <select formControlName="model" class="form-control">
+          <option value="">Select a model</option>
+          <option *ngFor="let m of models" [value]="m.id">{{ m.name || m.id }}</option>
+        </select>
+        <div class="error" *ngIf="model?.invalid && model?.touched">Model is required</div>
+      </div>
+
+      <div class="form-group">
+        <label>TEMPERATURE ({{ agentForm.get('temperature')?.value }})</label>
+        <input type="range" formControlName="temperature" min="0" max="2" step="0.1" class="slider" />
+      </div>
+
+      <div class="form-group">
+        <label>MAX TOKENS</label>
+        <input type="number" formControlName="max_tokens" class="form-control" />
+      </div>
+
+      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+      <div class="button-group">
+        <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'CREATING...' : 'CREATE AGENT' }}
+        </button>
+        <button type="button" class="btn-secondary" routerLink="/dashboard">CANCEL</button>
+      </div>
+    </form>
+  </div>
+</div>

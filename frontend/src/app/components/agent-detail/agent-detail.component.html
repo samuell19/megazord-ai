@@ -1,0 +1,50 @@
+<div class="agent-detail-container">
+  <div class="agent-header">
+    <div class="header-content">
+      <button class="btn-back" routerLink="/dashboard">← BACK</button>
+      <div class="agent-info" *ngIf="agent">
+        <h1>{{ agent.name }}</h1>
+        <span class="model">{{ agent.model }}</span>
+      </div>
+      <button class="btn-delete" (click)="deleteAgent()" *ngIf="agent">DELETE</button>
+    </div>
+  </div>
+
+  <div class="chat-container">
+    <div class="messages-area">
+      <div class="message" *ngFor="let msg of messages" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+        <div class="message-header">
+          <span class="role">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</span>
+          <span class="time">{{ msg.timestamp | date: 'short' }}</span>
+        </div>
+        <div class="message-content">{{ msg.content }}</div>
+      </div>
+
+      <div class="loading-message" *ngIf="isSending">
+        <div class="spinner"></div>
+        <span>AI is thinking...</span>
+      </div>
+
+      <div class="empty-state" *ngIf="messages.length === 0 && !isSending">
+        <p>Start a conversation with your AI agent</p>
+      </div>
+    </div>
+
+    <div class="error-banner" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="input-area">
+      <input
+        [(ngModel)]="currentMessage"
+        (keyup.enter)="sendMessage()"
+        placeholder="Type your message..."
+        [disabled]="isSending"
+        class="message-input"
+      />
+      <button (click)="sendMessage()" [disabled]="!currentMessage.trim() || isSending" class="btn-send">
+        SEND
+      </button>
+    </div>
+  </div>
+</div>

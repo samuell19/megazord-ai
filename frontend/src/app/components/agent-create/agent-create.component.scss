@@ -1,0 +1,107 @@
+.create-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  padding: 20px;
+}
+
+.create-card {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(0, 20, 40, 0.8);
+  border: 1px solid #00ffff;
+  border-radius: 4px;
+  padding: 40px;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+
+  h1 {
+    color: #00ffff;
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin: 0 0 30px 0;
+    text-align: center;
+  }
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    font-size: 11px;
+    color: #00ffff;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .form-control, select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 2px;
+    color: #fff;
+    font-size: 14px;
+
+    &:focus {
+      outline: none;
+      border-color: #00ffff;
+    }
+  }
+
+  .slider {
+    width: 100%;
+  }
+
+  .error {
+    color: #ff0055;
+    font-size: 11px;
+    margin-top: 6px;
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+
+  button {
+    flex: 1;
+    padding: 14px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-primary {
+    background: transparent;
+    border: 2px solid #00ffff;
+    color: #00ffff;
+
+    &:hover:not(:disabled) {
+      background: rgba(0, 255, 255, 0.1);
+    }
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.loading {
+  text-align: center;
+  color: #00ffff;
+  padding: 40px;
+}
