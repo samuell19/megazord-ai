@@ -1,46 +1,103 @@
 <div class="create-container">
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="scan-line"></div>
+    <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div>
+    <div class="particle p4"></div><div class="particle p5"></div><div class="particle p6"></div>
+  </div>
+
+  <div class="hud-frame">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+  </div>
+
   <div class="create-card">
-    <h1>CREATE NEW AGENT</h1>
-    
-    <div class="loading" *ngIf="isLoadingModels">Loading models...</div>
+    <div class="card-radar">
+      <div class="radar-ring r1"></div>
+      <div class="radar-ring r2"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-center"><span>⚡</span></div>
+    </div>
+
+    <div class="card-header">
+      <h1>CREATE NEW AGENT</h1>
+      <div class="title-line"></div>
+      <p class="subtitle">◂ NEURAL DEPLOYMENT ▸</p>
+    </div>
+
+    <div class="loading-hud" *ngIf="isLoadingModels">
+      <div class="mini-loader">
+        <div class="ml-ring r1"></div>
+        <div class="ml-ring r2"></div>
+        <span class="ml-icon">⬡</span>
+      </div>
+      <span class="loading-text">LOADING MODELS...</span>
+    </div>
     
     <form [formGroup]="agentForm" (ngSubmit)="onSubmit()" *ngIf="!isLoadingModels">
       <div class="form-group">
-        <label>AGENT NAME</label>
-        <input formControlName="name" class="form-control" placeholder="My AI Assistant" />
+        <label><span class="label-icon">▹</span> AGENT NAME</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div><div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div><div class="input-corner ibr"></div>
+          <input formControlName="name" class="form-control" placeholder="My AI Assistant" />
+        </div>
         <div class="error" *ngIf="name?.invalid && name?.touched">
-          <span *ngIf="name?.errors?.['required']">Name is required</span>
-          <span *ngIf="name?.errors?.['minlength']">Name must be at least 3 characters</span>
+          <span *ngIf="name?.errors?.['required']">⚠ Name is required</span>
+          <span *ngIf="name?.errors?.['minlength']">⚠ Name must be at least 3 characters</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label>MODEL</label>
-        <select formControlName="model" class="form-control">
-          <option value="">Select a model</option>
-          <option *ngFor="let m of models" [value]="m.id">{{ m.name || m.id }}</option>
-        </select>
-        <div class="error" *ngIf="model?.invalid && model?.touched">Model is required</div>
+        <label><span class="label-icon">▹</span> MODEL</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div><div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div><div class="input-corner ibr"></div>
+          <select formControlName="model" class="form-control">
+            <option value="">Select a model</option>
+            <option *ngFor="let m of models" [value]="m.id">{{ m.name || m.id }}</option>
+          </select>
+        </div>
+        <div class="error" *ngIf="model?.invalid && model?.touched">⚠ Model is required</div>
+      </div>
+
+      <div class="form-group slider-group">
+        <label><span class="label-icon">▹</span> TEMPERATURE <span class="value-tag">{{ agentForm.get('temperature')?.value }}</span></label>
+        <div class="slider-wrap">
+          <span class="slider-label">0</span>
+          <input type="range" formControlName="temperature" min="0" max="2" step="0.1" class="slider" />
+          <span class="slider-label">2</span>
+        </div>
       </div>
 
       <div class="form-group">
-        <label>TEMPERATURE ({{ agentForm.get('temperature')?.value }})</label>
-        <input type="range" formControlName="temperature" min="0" max="2" step="0.1" class="slider" />
+        <label><span class="label-icon">▹</span> MAX TOKENS</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div><div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div><div class="input-corner ibr"></div>
+          <input type="number" formControlName="max_tokens" class="form-control" />
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>MAX TOKENS</label>
-        <input type="number" formControlName="max_tokens" class="form-control" />
-      </div>
-
-      <div class="error" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="error global-error" *ngIf="errorMessage">⚠ {{ errorMessage }}</div>
 
       <div class="button-group">
         <button type="submit" class="btn-primary" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'CREATING...' : 'CREATE AGENT' }}
+          <span class="btn-content" *ngIf="!isSubmitting"><span class="btn-icon">◈</span> CREATE AGENT</span>
+          <span class="btn-content loading" *ngIf="isSubmitting"><span class="spinner-mini"></span> CREATING...</span>
         </button>
-        <button type="button" class="btn-secondary" routerLink="/dashboard">CANCEL</button>
+        <button type="button" class="btn-secondary" routerLink="/dashboard">
+          ◂ CANCEL
+        </button>
       </div>
     </form>
+
+    <div class="card-footer-data">
+      <span>MODULE::AGENT_DEPLOY</span>
+      <span>|</span>
+      <span>TYPE::LLM</span>
+      <span>|</span>
+      <span class="blink">▶ READY</span>
+    </div>
   </div>
 </div>

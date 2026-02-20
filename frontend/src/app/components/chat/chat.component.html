@@ -1,49 +1,198 @@
 <div class="chat-container">
+  <!-- Animated background particles -->
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="particle" *ngFor="let p of particles" [style.left.%]="p.x" [style.top.%]="p.y" [style.animationDelay.s]="p.delay" [style.animationDuration.s]="p.duration"></div>
+    <div class="scan-line"></div>
+  </div>
+
+  <!-- Header HUD -->
   <div class="chat-header">
-    <button class="btn-back" (click)="goBack()">← BACK</button>
+    <button class="btn-back" (click)="goBack()">
+      <span class="btn-icon">◂</span> BACK
+    </button>
     <div class="session-info" *ngIf="session && agent">
-      <span class="emoji">{{ session.emoji || '💬' }}</span>
+      <div class="hud-avatar">
+        <div class="avatar-ring"></div>
+        <span class="emoji">{{ session.emoji || '🤖' }}</span>
+      </div>
       <div class="info">
         <h1>{{ session.title || 'New Conversation' }}</h1>
-        <span class="agent-name">{{ agent.name }}</span>
+        <span class="agent-name">
+          <span class="status-dot"></span>
+          {{ agent.name }} <span class="tag">// ONLINE</span>
+        </span>
       </div>
     </div>
-    <div class="spacer"></div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-label">MSGS</span>
+        <span class="stat-value">{{ messages.length }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">STATUS</span>
+        <span class="stat-value" [class.active]="!isSending">{{ isSending ? 'PROC' : 'READY' }}</span>
+      </div>
+    </div>
   </div>
 
-  <div class="messages-area">
-    <div class="message" *ngFor="let msg of messages" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
-      <div class="message-header">
-        <span class="role">{{ msg.role === 'user' ? 'YOU' : 'AI' }}</span>
-        <span class="time">{{ msg.createdAt | date: 'short' }}</span>
+  <!-- Messages Area -->
+  <div class="messages-area" #messagesArea>
+    <div class="message" *ngFor="let msg of messages; let i = index"
+         [class.user]="msg.role === 'user'"
+         [class.assistant]="msg.role === 'assistant'"
+         [style.animationDelay.ms]="i * 50">
+      <div class="message-gutter">
+        <div class="msg-icon" [class.user-icon]="msg.role === 'user'" [class.ai-icon]="msg.role === 'assistant'">
+          {{ msg.role === 'user' ? '◈' : '⬡' }}
+        </div>
+        <div class="msg-line"></div>
       </div>
-      <div class="message-content">{{ msg.content }}</div>
+      <div class="message-body">
+        <div class="message-header">
+          <span class="role">{{ msg.role === 'user' ? 'YOU' : 'A.I. CORE' }}</span>
+          <span class="time">{{ msg.createdAt | date: 'HH:mm:ss' }}</span>
+        </div>
+        <div class="message-content">{{ msg.content }}</div>
+        <div class="message-footer">
+          <span class="msg-id">MSG-{{ i + 1 | number: '3.0-0' }}</span>
+        </div>
+      </div>
     </div>
 
+    <!-- AI Thinking Animation -->
     <div class="loading-message" *ngIf="isSending">
-      <div class="spinner"></div>
-      <span>AI is thinking...</span>
+      <div class="ai-thinking">
+        <div class="thinking-core">
+          <div class="core-ring ring-1"></div>
+          <div class="core-ring ring-2"></div>
+          <div class="core-ring ring-3"></div>
+          <span class="core-icon">⬡</span>
+        </div>
+        <div class="thinking-text">
+          <span class="processing-label">PROCESSING</span>
+          <span class="thinking-dots">
+            <span>.</span><span>.</span><span>.</span>
+          </span>
+        </div>
+      </div>
     </div>
 
-    <div class="empty-state" *ngIf="messages.length === 0 && !isSending">
-      <p>Start your conversation</p>
+    <!-- Empty State: Jarvis HUD with Floating Bubbles -->
+    <div class="empty-state-hud" *ngIf="messages.length === 0 && !isSending">
+      <!-- Central Radar / Core -->
+      <div class="jarvis-core">
+        <div class="radar-container">
+          <div class="radar-ring r1"></div>
+          <div class="radar-ring r2"></div>
+          <div class="radar-ring r3"></div>
+          <div class="radar-sweep"></div>
+          <div class="radar-center">
+            <span class="core-label">AI</span>
+          </div>
+        </div>
+        <div class="core-status">
+          <span class="sys-text">SYSTEM READY</span>
+          <span class="sys-sub">{{ agent?.name || 'AGENT' }} v2.0 // NEURAL LINK ACTIVE</span>
+        </div>
+      </div>
+
+      <!-- Floating HUD Bubbles - Suggested Prompts -->
+      <div class="floating-bubbles">
+        <div class="hud-bubble bubble-1" (click)="usePrompt(suggestedPrompts[0])" *ngIf="suggestedPrompts[0]">
+          <div class="bubble-border"></div>
+          <div class="bubble-icon">💡</div>
+          <div class="bubble-content">
+            <span class="bubble-label">PROMPT</span>
+            <span class="bubble-text">{{ suggestedPrompts[0] }}</span>
+          </div>
+          <div class="bubble-glow"></div>
+        </div>
+
+        <div class="hud-bubble bubble-2" (click)="usePrompt(suggestedPrompts[1])" *ngIf="suggestedPrompts[1]">
+          <div class="bubble-border"></div>
+          <div class="bubble-icon">🔍</div>
+          <div class="bubble-content">
+            <span class="bubble-label">PROMPT</span>
+            <span class="bubble-text">{{ suggestedPrompts[1] }}</span>
+          </div>
+          <div class="bubble-glow"></div>
+        </div>
+
+        <div class="hud-bubble bubble-3" (click)="usePrompt(suggestedPrompts[2])" *ngIf="suggestedPrompts[2]">
+          <div class="bubble-border"></div>
+          <div class="bubble-icon">⚡</div>
+          <div class="bubble-content">
+            <span class="bubble-label">PROMPT</span>
+            <span class="bubble-text">{{ suggestedPrompts[2] }}</span>
+          </div>
+          <div class="bubble-glow"></div>
+        </div>
+
+        <div class="hud-bubble bubble-4" (click)="usePrompt(suggestedPrompts[3])" *ngIf="suggestedPrompts[3]">
+          <div class="bubble-border"></div>
+          <div class="bubble-icon">🧠</div>
+          <div class="bubble-content">
+            <span class="bubble-label">PROMPT</span>
+            <span class="bubble-text">{{ suggestedPrompts[3] }}</span>
+          </div>
+          <div class="bubble-glow"></div>
+        </div>
+      </div>
+
+      <!-- Tool Mockup Floating Cards -->
+      <div class="tool-cards">
+        <div class="tool-card card-1" *ngFor="let tool of futureTools; let i = index"
+             [class]="'tool-card card-' + (i + 1)">
+          <div class="card-header">
+            <span class="card-icon">{{ tool.icon }}</span>
+            <span class="card-status">{{ tool.status }}</span>
+          </div>
+          <span class="card-name">{{ tool.name }}</span>
+          <div class="card-bar">
+            <div class="card-bar-fill" [style.width.%]="tool.progress"></div>
+          </div>
+          <span class="card-desc">{{ tool.description }}</span>
+        </div>
+      </div>
+
+      <!-- Bottom HUD Data Bar -->
+      <div class="hud-data-bar">
+        <span class="data-item">SESSION::{{ session?.id?.substring(0,8) || '00000000' }}</span>
+        <span class="data-sep">|</span>
+        <span class="data-item">LATENCY::{{ latency }}ms</span>
+        <span class="data-sep">|</span>
+        <span class="data-item">TOKENS::AVAILABLE</span>
+        <span class="data-sep">|</span>
+        <span class="data-item blink">▶ AWAITING INPUT</span>
+      </div>
     </div>
   </div>
 
+  <!-- Error Banner -->
   <div class="error-banner" *ngIf="errorMessage">
-    {{ errorMessage }}
+    <span class="err-icon">⚠</span> {{ errorMessage }}
   </div>
 
+  <!-- Input Area HUD -->
   <div class="input-area">
-    <input
-      [(ngModel)]="currentMessage"
-      (keyup.enter)="sendMessage()"
-      placeholder="Type your message..."
-      [disabled]="isSending"
-      class="message-input"
-    />
+    <div class="input-hud-frame">
+      <div class="input-corner tl"></div>
+      <div class="input-corner tr"></div>
+      <div class="input-corner bl"></div>
+      <div class="input-corner br"></div>
+      <textarea
+        [(ngModel)]="currentMessage"
+        (keydown.enter)="onEnterKey($event)"
+        placeholder="Enter command..."
+        [disabled]="isSending"
+        class="message-input"
+        rows="1"
+      ></textarea>
+    </div>
     <button (click)="sendMessage()" [disabled]="!currentMessage.trim() || isSending" class="btn-send">
-      SEND
+      <span class="send-icon">◈</span>
+      <span class="send-text">TRANSMIT</span>
     </button>
   </div>
 </div>

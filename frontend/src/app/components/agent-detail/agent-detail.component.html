@@ -1,46 +1,84 @@
 <div class="agent-sessions-container">
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="scan-line"></div>
+    <div class="particle" *ngFor="let i of [1,2,3,4,5,6,7,8]" [class]="'p' + i"></div>
+  </div>
+
+  <div class="hud-frame">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+  </div>
+
   <div class="agent-header">
     <div class="header-content">
-      <button class="btn-back" routerLink="/dashboard">← BACK</button>
+      <button class="btn-back" routerLink="/dashboard"><span class="btn-arrow">◂</span> BACK</button>
       <div class="agent-info" *ngIf="agent">
+        <div class="agent-avatar-ring">
+          <div class="avatar-ring r1"></div>
+          <div class="avatar-ring r2"></div>
+          <div class="avatar-sweep"></div>
+          <span class="avatar-icon">🤖</span>
+        </div>
         <h1>{{ agent.name }}</h1>
-        <span class="model">{{ agent.model }}</span>
+        <span class="model-badge">{{ agent.model }}</span>
       </div>
-      <button class="btn-delete" (click)="deleteAgent()" *ngIf="agent">DELETE</button>
+      <button class="btn-delete" (click)="deleteAgent()" *ngIf="agent">
+        <span class="btn-x">✕</span> DELETE
+      </button>
+    </div>
+    <div class="header-data-strip">
+      <span>SYS::AGENT_DETAIL</span>
+      <span>|</span>
+      <span>STATUS::<span class="status-online">ONLINE</span></span>
+      <span>|</span>
+      <span class="blink">▶ ACTIVE</span>
     </div>
   </div>
 
   <div class="sessions-content">
     <div class="sessions-header">
-      <h2>Conversations</h2>
+      <div class="section-title">
+        <span class="title-marker">◈</span>
+        <h2>CONVERSATIONS</h2>
+        <div class="title-line"></div>
+      </div>
       <button class="btn-new-session" (click)="createNewSession()">
-        <span class="icon">+</span>
-        NEW CONVERSATION
+        <span class="icon">⊕</span> NEW CONVERSATION
       </button>
     </div>
 
     <div class="error-banner" *ngIf="errorMessage">
-      {{ errorMessage }}
+      ⚠ {{ errorMessage }}
     </div>
 
     <div class="sessions-grid" *ngIf="!isLoading">
       <div class="empty-state" *ngIf="sessions.length === 0">
-        <div class="empty-icon">💬</div>
+        <div class="empty-rings">
+          <div class="e-ring r1"></div>
+          <div class="e-ring r2"></div>
+          <div class="e-ring r3"></div>
+          <span class="empty-icon">💬</span>
+        </div>
         <p>No conversations yet</p>
-        <span>Start a new conversation to get started</span>
+        <span class="empty-sub">Start a new conversation to get started</span>
       </div>
 
       <div 
-        *ngFor="let session of sessions"
+        *ngFor="let session of sessions; let i = index"
         class="session-card"
+        [style.animation-delay]="(i * 0.06) + 's'"
         (click)="openSession(session)"
       >
+        <div class="card-glow"></div>
+        <div class="card-border-anim"></div>
         <div class="session-emoji">{{ session.emoji || '💬' }}</div>
         <div class="session-info">
           <h3>{{ session.title || 'New Conversation' }}</h3>
           <p *ngIf="session.description">{{ session.description }}</p>
           <p *ngIf="!session.description" class="no-description">No description yet</p>
           <div class="session-meta">
+            <span class="meta-dot"></span>
             <span class="date" *ngIf="session.lastMessageAt">
               {{ session.lastMessageAt | date: 'short' }}
             </span>
@@ -50,14 +88,19 @@
           </div>
         </div>
         <button class="btn-delete-session" (click)="deleteSession(session, $event)" title="Delete session">
-          ×
+          ✕
         </button>
       </div>
     </div>
 
     <div class="loading-state" *ngIf="isLoading">
-      <div class="spinner"></div>
-      <span>Loading conversations...</span>
+      <div class="loader-core">
+        <div class="l-ring r1"></div>
+        <div class="l-ring r2"></div>
+        <div class="l-ring r3"></div>
+        <span class="l-icon">⬡</span>
+      </div>
+      <span class="loading-text">LOADING CONVERSATIONS...</span>
     </div>
   </div>
 </div>

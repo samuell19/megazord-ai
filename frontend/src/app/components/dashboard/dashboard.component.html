@@ -1,79 +1,166 @@
 <div class="dashboard-container">
+  <!-- Background HUD -->
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="scan-line"></div>
+    <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div>
+    <div class="particle p4"></div><div class="particle p5"></div><div class="particle p6"></div>
+    <div class="particle p7"></div><div class="particle p8"></div><div class="particle p9"></div>
+    <div class="particle p10"></div>
+  </div>
+
+  <!-- Header HUD -->
   <div class="dashboard-header">
     <div class="header-content">
-      <h1>MEGAZORD AI</h1>
-      <div class="user-info">
-        <span class="username">{{ currentUser?.username }}</span>
-        <button class="btn-logout" (click)="logout()">LOGOUT</button>
+      <div class="header-left">
+        <div class="logo-radar">
+          <div class="mini-ring r1"></div>
+          <div class="mini-ring r2"></div>
+          <div class="mini-sweep"></div>
+          <span class="logo-core">◈</span>
+        </div>
+        <div class="logo-text">
+          <h1>MEGAZORD AI</h1>
+          <span class="sys-tag">COMMAND CENTER v2.0</span>
+        </div>
       </div>
+      <div class="header-right">
+        <div class="user-info">
+          <div class="user-badge">
+            <span class="status-dot"></span>
+            <span class="username">{{ currentUser?.username }}</span>
+          </div>
+          <div class="user-meta">
+            <span class="user-label">OPERATOR</span>
+          </div>
+        </div>
+        <button class="btn-logout" (click)="logout()">
+          <span class="logout-icon">⏻</span> LOGOUT
+        </button>
+      </div>
+    </div>
+    <div class="header-data-strip">
+      <span>AGENTS::{{ agents.length }}</span>
+      <span class="sep">|</span>
+      <span>API::{{ hasApiKey ? 'LINKED' : 'OFFLINE' }}</span>
+      <span class="sep">|</span>
+      <span>STATUS::OPERATIONAL</span>
+      <span class="sep">|</span>
+      <span class="blink">▶ LIVE</span>
     </div>
   </div>
 
   <div class="dashboard-content">
     <!-- Loading State -->
-    <div class="loading" *ngIf="isLoading">
-      <div class="spinner"></div>
+    <div class="loading-hud" *ngIf="isLoading">
+      <div class="loader-core">
+        <div class="loader-ring lr1"></div>
+        <div class="loader-ring lr2"></div>
+        <div class="loader-ring lr3"></div>
+        <span class="loader-icon">⬡</span>
+      </div>
       <p>LOADING SYSTEM...</p>
+      <div class="loader-bar">
+        <div class="loader-bar-fill"></div>
+      </div>
     </div>
 
     <!-- No API Key Warning -->
     <div class="warning-card" *ngIf="!isLoading && !hasApiKey">
+      <div class="warning-border"></div>
       <div class="warning-icon">⚠</div>
       <h2>API KEY REQUIRED</h2>
-      <p>Configure your OpenRouter API key to create and use AI agents</p>
+      <p>Configure your OpenRouter API key to activate the neural link</p>
       <button class="btn-primary" (click)="navigateToApiKeyConfig()">
-        CONFIGURE API KEY
+        <span class="btn-icon">🔑</span> CONFIGURE API KEY
       </button>
+      <div class="warning-footer">
+        <span>MODULE::API_AUTH</span> <span class="sep">|</span> <span class="blink">⚠ DISCONNECTED</span>
+      </div>
     </div>
 
-    <!-- Agents Grid -->
+    <!-- Agents Section -->
     <div class="agents-section" *ngIf="!isLoading && hasApiKey">
       <div class="section-header">
-        <h2>YOUR AGENTS</h2>
+        <div class="section-title">
+          <span class="title-deco">◇</span>
+          <h2>YOUR AGENTS</h2>
+          <div class="title-line"></div>
+        </div>
         <button class="btn-create" (click)="navigateToCreateAgent()">
-          + CREATE AGENT
+          <span class="create-icon">+</span> CREATE AGENT
         </button>
       </div>
 
       <div class="error-message" *ngIf="errorMessage">
-        {{ errorMessage }}
+        <span class="err-icon">⚠</span> {{ errorMessage }}
       </div>
 
+      <!-- Agents Grid -->
       <div class="agents-grid" *ngIf="agents.length > 0">
-        <div
-          class="agent-card"
-          *ngFor="let agent of agents"
-          (click)="navigateToAgent(agent.id)"
-        >
-          <div class="agent-icon">🤖</div>
+        <div class="agent-card" *ngFor="let agent of agents; let i = index"
+             (click)="navigateToAgent(agent.id)" [style.animationDelay.ms]="i * 80">
+          <div class="card-border-anim"></div>
+          <div class="card-top">
+            <div class="agent-avatar">
+              <div class="avatar-ring"></div>
+              <span class="avatar-icon">🤖</span>
+            </div>
+            <div class="card-status">
+              <span class="status-indicator active"></span>
+              <span class="status-text">ONLINE</span>
+            </div>
+          </div>
           <div class="agent-info">
             <h3>{{ agent.name }}</h3>
-            <p class="agent-model">{{ agent.model }}</p>
-            <p class="agent-date">Created: {{ agent.createdAt | date: 'short' }}</p>
+            <span class="agent-model">{{ agent.model }}</span>
           </div>
-          <div class="agent-status">
-            <span class="status-indicator active"></span>
-            <span class="status-text">ACTIVE</span>
+          <div class="card-footer">
+            <span class="agent-date">{{ agent.createdAt | date: 'dd/MM/yy HH:mm' }}</span>
+            <span class="card-arrow">▸</span>
           </div>
+          <div class="card-glow"></div>
         </div>
       </div>
 
+      <!-- Empty State -->
       <div class="empty-state" *ngIf="agents.length === 0">
-        <div class="empty-icon">🤖</div>
-        <h3>NO AGENTS YET</h3>
-        <p>Create your first AI agent to get started</p>
+        <div class="empty-core">
+          <div class="empty-ring er1"></div>
+          <div class="empty-ring er2"></div>
+          <div class="empty-ring er3"></div>
+          <span class="empty-icon">🤖</span>
+        </div>
+        <h3>NO AGENTS DEPLOYED</h3>
+        <p>Deploy your first AI agent to initialize the neural network</p>
         <button class="btn-primary" (click)="navigateToCreateAgent()">
-          CREATE YOUR FIRST AGENT
+          <span class="btn-icon">+</span> DEPLOY FIRST AGENT
         </button>
       </div>
     </div>
 
     <!-- Quick Actions -->
     <div class="quick-actions" *ngIf="!isLoading && hasApiKey">
-      <button class="action-btn" (click)="navigateToApiKeyConfig()">
-        <span class="action-icon">🔑</span>
-        <span class="action-text">API KEY SETTINGS</span>
-      </button>
+      <div class="actions-header">
+        <span class="title-deco">◇</span>
+        <span class="actions-label">QUICK ACCESS</span>
+      </div>
+      <div class="actions-grid">
+        <button class="action-btn" (click)="navigateToApiKeyConfig()">
+          <div class="action-icon-wrap">
+            <span class="action-icon">🔑</span>
+          </div>
+          <span class="action-text">API KEY</span>
+          <span class="action-sub">SETTINGS</span>
+        </button>
+        <button class="action-btn" (click)="navigateToCreateAgent()">
+          <div class="action-icon-wrap">
+            <span class="action-icon">⚡</span>
+          </div>
+          <span class="action-text">NEW AGENT</span>
+          <span class="action-sub">DEPLOY</span>
+        </button>
+      </div>
     </div>
   </div>
 </div>

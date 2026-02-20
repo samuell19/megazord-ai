@@ -1,69 +1,103 @@
 <div class="api-key-container">
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="scan-line"></div>
+    <div class="particle p1"></div><div class="particle p2"></div><div class="particle p3"></div>
+    <div class="particle p4"></div><div class="particle p5"></div><div class="particle p6"></div>
+  </div>
+
+  <div class="hud-frame">
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+  </div>
+
   <div class="api-key-card">
+    <div class="card-radar">
+      <div class="radar-ring r1"></div>
+      <div class="radar-ring r2"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-center"><span>🔑</span></div>
+    </div>
+
     <div class="header">
       <h1>API KEY CONFIGURATION</h1>
-      <p class="subtitle">OPENROUTER API ACCESS</p>
+      <div class="title-line"></div>
+      <p class="subtitle">◂ OPENROUTER API ACCESS ▸</p>
     </div>
 
     <div class="existing-key" *ngIf="hasExistingKey && !isLoading">
+      <div class="section-label">
+        <span class="label-icon">◈</span> ACTIVE KEY
+        <span class="status-badge">CONFIGURED</span>
+      </div>
       <div class="key-info">
-        <label>CURRENT KEY</label>
-        <div class="masked-key">{{ maskedKey }}</div>
+        <div class="key-display">
+          <span class="key-prefix">KEY :</span>
+          <span class="masked-key">{{ maskedKey }}</span>
+        </div>
       </div>
       <button type="button" class="btn-danger" (click)="onDelete()">
-        DELETE KEY
+        <span class="btn-x">✕</span> DELETE KEY
       </button>
     </div>
 
     <form [formGroup]="apiKeyForm" (ngSubmit)="onSubmit()" class="api-key-form">
       <div class="form-group">
         <label for="key">
+          <span class="label-icon">▹</span>
           {{ hasExistingKey ? 'NEW API KEY' : 'API KEY' }}
         </label>
-        <input
-          id="key"
-          type="password"
-          formControlName="key"
-          class="form-control"
-          [class.error]="key?.invalid && key?.touched"
-          placeholder="sk-or-v1-..."
-        />
+        <div class="input-frame">
+          <div class="input-corner itl"></div><div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div><div class="input-corner ibr"></div>
+          <input
+            id="key"
+            type="password"
+            formControlName="key"
+            class="form-control"
+            [class.input-error]="key?.invalid && key?.touched"
+            placeholder="sk-or-v1-..."
+          />
+        </div>
         <div class="error-message" *ngIf="key?.invalid && key?.touched">
-          <span *ngIf="key?.errors?.['required']">API key is required</span>
-          <span *ngIf="key?.errors?.['minlength']">API key must be at least 10 characters</span>
+          <span *ngIf="key?.errors?.['required']">⚠ API key is required</span>
+          <span *ngIf="key?.errors?.['minlength']">⚠ API key must be at least 10 characters</span>
         </div>
         <div class="help-text">
-          Get your API key from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a>
+          Get your API key from <a href="https://openrouter.ai/keys" target="_blank">OpenRouter ↗</a>
         </div>
       </div>
 
       <div class="success-message" *ngIf="successMessage">
-        <span>✓ {{ successMessage }}</span>
+        <span class="success-icon">◈</span> {{ successMessage }}
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        <span>{{ errorMessage }}</span>
+      <div class="error-banner" *ngIf="errorMessage">
+        ⚠ {{ errorMessage }}
       </div>
 
       <div class="button-group">
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="isLoading"
-        >
-          <span *ngIf="!isLoading">{{ hasExistingKey ? 'UPDATE KEY' : 'SAVE KEY' }}</span>
-          <span *ngIf="isLoading">PROCESSING...</span>
+        <button type="submit" class="btn-primary" [disabled]="isLoading">
+          <span class="btn-content" *ngIf="!isLoading">
+            <span class="btn-icon">◈</span> {{ hasExistingKey ? 'UPDATE KEY' : 'SAVE KEY' }}
+          </span>
+          <span class="btn-content loading" *ngIf="isLoading">
+            <span class="spinner-mini"></span> PROCESSING...
+          </span>
         </button>
 
-        <button
-          type="button"
-          class="btn-secondary"
-          routerLink="/dashboard"
-          [disabled]="isLoading"
-        >
-          BACK TO DASHBOARD
+        <button type="button" class="btn-secondary" routerLink="/dashboard" [disabled]="isLoading">
+          ◂ BACK TO DASHBOARD
         </button>
       </div>
     </form>
+
+    <div class="card-footer-data">
+      <span>MODULE::API_CONFIG</span>
+      <span>|</span>
+      <span>PROVIDER::OPENROUTER</span>
+      <span>|</span>
+      <span class="blink">▶ SECURE</span>
+    </div>
   </div>
 </div>

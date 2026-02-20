@@ -1,45 +1,94 @@
 <div class="login-container">
+  <!-- Background HUD -->
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="scan-line"></div>
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+    <div class="particle p6"></div>
+    <div class="particle p7"></div>
+    <div class="particle p8"></div>
+  </div>
+
+  <!-- Decorative HUD corners -->
+  <div class="hud-frame">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+  </div>
+
   <div class="login-card">
+    <!-- Radar icon -->
+    <div class="card-radar">
+      <div class="radar-ring r1"></div>
+      <div class="radar-ring r2"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-center">
+        <span>◈</span>
+      </div>
+    </div>
+
     <div class="login-header">
       <h1>MEGAZORD AI</h1>
-      <p class="subtitle">SYSTEM ACCESS</p>
+      <div class="title-line"></div>
+      <p class="subtitle">◂ SYSTEM ACCESS ▸</p>
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
       <div class="form-group">
-        <label for="email">EMAIL</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="form-control"
-          [class.error]="email?.invalid && email?.touched"
-          placeholder="user@domain.com"
-        />
+        <label for="email">
+          <span class="label-icon">▹</span> EMAIL
+        </label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div>
+          <div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div>
+          <div class="input-corner ibr"></div>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-control"
+            [class.error]="email?.invalid && email?.touched"
+            placeholder="user@domain.com"
+          />
+        </div>
         <div class="error-message" *ngIf="email?.invalid && email?.touched">
-          <span *ngIf="email?.errors?.['required']">Email is required</span>
-          <span *ngIf="email?.errors?.['email']">Invalid email format</span>
+          <span *ngIf="email?.errors?.['required']">⚠ Email is required</span>
+          <span *ngIf="email?.errors?.['email']">⚠ Invalid email format</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="password">PASSWORD</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="password?.invalid && password?.touched"
-          placeholder="••••••••"
-        />
+        <label for="password">
+          <span class="label-icon">▹</span> PASSWORD
+        </label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div>
+          <div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div>
+          <div class="input-corner ibr"></div>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-control"
+            [class.error]="password?.invalid && password?.touched"
+            placeholder="••••••••"
+          />
+        </div>
         <div class="error-message" *ngIf="password?.invalid && password?.touched">
-          <span *ngIf="password?.errors?.['required']">Password is required</span>
-          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+          <span *ngIf="password?.errors?.['required']">⚠ Password is required</span>
+          <span *ngIf="password?.errors?.['minlength']">⚠ Password must be at least 6 characters</span>
         </div>
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        <span>{{ errorMessage }}</span>
+      <div class="error-message global-error" *ngIf="errorMessage">
+        <span>⚠ {{ errorMessage }}</span>
       </div>
 
       <button
@@ -47,14 +96,28 @@
         class="btn-primary"
         [disabled]="isLoading"
       >
-        <span *ngIf="!isLoading">ACCESS SYSTEM</span>
-        <span *ngIf="isLoading">AUTHENTICATING...</span>
+        <span class="btn-content" *ngIf="!isLoading">
+          <span class="btn-icon">◈</span> ACCESS SYSTEM
+        </span>
+        <span class="btn-content loading" *ngIf="isLoading">
+          <span class="spinner-mini"></span> AUTHENTICATING...
+        </span>
       </button>
 
       <div class="register-link">
+        <span class="link-line"></span>
         <span>No account?</span>
-        <a routerLink="/register">Create new user</a>
+        <a routerLink="/register">Create new user →</a>
+        <span class="link-line"></span>
       </div>
     </form>
+
+    <div class="card-footer-data">
+      <span>SYS::SECURE_AUTH</span>
+      <span>|</span>
+      <span>ENCRYPT::AES-256</span>
+      <span>|</span>
+      <span class="blink">▶ READY</span>
+    </div>
   </div>
 </div>

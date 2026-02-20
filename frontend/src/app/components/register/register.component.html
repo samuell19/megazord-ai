@@ -1,92 +1,126 @@
 <div class="register-container">
+  <!-- Background HUD -->
+  <div class="hud-bg">
+    <div class="grid-lines"></div>
+    <div class="scan-line"></div>
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+    <div class="particle p6"></div>
+  </div>
+
+  <div class="hud-frame">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+  </div>
+
   <div class="register-card">
+    <div class="card-radar">
+      <div class="radar-ring r1"></div>
+      <div class="radar-ring r2"></div>
+      <div class="radar-sweep"></div>
+      <div class="radar-center"><span>⬡</span></div>
+    </div>
+
     <div class="register-header">
       <h1>MEGAZORD AI</h1>
-      <p class="subtitle">NEW USER REGISTRATION</p>
+      <div class="title-line"></div>
+      <p class="subtitle">◂ NEW USER REGISTRATION ▸</p>
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
       <div class="form-group">
-        <label for="email">EMAIL</label>
-        <input
-          id="email"
-          type="email"
-          formControlName="email"
-          class="form-control"
-          [class.error]="email?.invalid && email?.touched"
-          placeholder="user@domain.com"
-        />
+        <label for="email"><span class="label-icon">▹</span> EMAIL</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div>
+          <div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div>
+          <div class="input-corner ibr"></div>
+          <input id="email" type="email" formControlName="email" class="form-control"
+            [class.error]="email?.invalid && email?.touched" placeholder="user@domain.com" />
+        </div>
         <div class="error-message" *ngIf="email?.invalid && email?.touched">
-          <span *ngIf="email?.errors?.['required']">Email is required</span>
-          <span *ngIf="email?.errors?.['email']">Invalid email format</span>
+          <span *ngIf="email?.errors?.['required']">⚠ Email is required</span>
+          <span *ngIf="email?.errors?.['email']">⚠ Invalid email format</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="username">USERNAME</label>
-        <input
-          id="username"
-          type="text"
-          formControlName="username"
-          class="form-control"
-          [class.error]="username?.invalid && username?.touched"
-          placeholder="username"
-        />
+        <label for="username"><span class="label-icon">▹</span> USERNAME</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div>
+          <div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div>
+          <div class="input-corner ibr"></div>
+          <input id="username" type="text" formControlName="username" class="form-control"
+            [class.error]="username?.invalid && username?.touched" placeholder="username" />
+        </div>
         <div class="error-message" *ngIf="username?.invalid && username?.touched">
-          <span *ngIf="username?.errors?.['required']">Username is required</span>
-          <span *ngIf="username?.errors?.['minlength']">Username must be at least 3 characters</span>
+          <span *ngIf="username?.errors?.['required']">⚠ Username is required</span>
+          <span *ngIf="username?.errors?.['minlength']">⚠ Username must be at least 3 characters</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="password">PASSWORD</label>
-        <input
-          id="password"
-          type="password"
-          formControlName="password"
-          class="form-control"
-          [class.error]="password?.invalid && password?.touched"
-          placeholder="••••••••"
-        />
+        <label for="password"><span class="label-icon">▹</span> PASSWORD</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div>
+          <div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div>
+          <div class="input-corner ibr"></div>
+          <input id="password" type="password" formControlName="password" class="form-control"
+            [class.error]="password?.invalid && password?.touched" placeholder="••••••••" />
+        </div>
         <div class="error-message" *ngIf="password?.invalid && password?.touched">
-          <span *ngIf="password?.errors?.['required']">Password is required</span>
-          <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters</span>
+          <span *ngIf="password?.errors?.['required']">⚠ Password is required</span>
+          <span *ngIf="password?.errors?.['minlength']">⚠ Password must be at least 6 characters</span>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="confirmPassword">CONFIRM PASSWORD</label>
-        <input
-          id="confirmPassword"
-          type="password"
-          formControlName="confirmPassword"
-          class="form-control"
-          [class.error]="(confirmPassword?.invalid && confirmPassword?.touched) || (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched)"
-          placeholder="••••••••"
-        />
+        <label for="confirmPassword"><span class="label-icon">▹</span> CONFIRM PASSWORD</label>
+        <div class="input-frame">
+          <div class="input-corner itl"></div>
+          <div class="input-corner itr"></div>
+          <div class="input-corner ibl"></div>
+          <div class="input-corner ibr"></div>
+          <input id="confirmPassword" type="password" formControlName="confirmPassword" class="form-control"
+            [class.error]="(confirmPassword?.invalid && confirmPassword?.touched) || (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched)"
+            placeholder="••••••••" />
+        </div>
         <div class="error-message" *ngIf="confirmPassword?.touched">
-          <span *ngIf="confirmPassword?.errors?.['required']">Confirm password is required</span>
-          <span *ngIf="registerForm.errors?.['passwordMismatch'] && !confirmPassword?.errors?.['required']">Passwords do not match</span>
+          <span *ngIf="confirmPassword?.errors?.['required']">⚠ Confirm password is required</span>
+          <span *ngIf="registerForm.errors?.['passwordMismatch'] && !confirmPassword?.errors?.['required']">⚠ Passwords do not match</span>
         </div>
       </div>
 
-      <div class="error-message" *ngIf="errorMessage">
-        <span>{{ errorMessage }}</span>
+      <div class="error-message global-error" *ngIf="errorMessage">
+        <span>⚠ {{ errorMessage }}</span>
       </div>
 
-      <button
-        type="submit"
-        class="btn-primary"
-        [disabled]="isLoading"
-      >
-        <span *ngIf="!isLoading">CREATE ACCOUNT</span>
-        <span *ngIf="isLoading">CREATING...</span>
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <span class="btn-content" *ngIf="!isLoading"><span class="btn-icon">◈</span> CREATE ACCOUNT</span>
+        <span class="btn-content loading" *ngIf="isLoading"><span class="spinner-mini"></span> CREATING...</span>
       </button>
 
       <div class="login-link">
+        <span class="link-line"></span>
         <span>Already have an account?</span>
-        <a routerLink="/login">Sign in</a>
+        <a routerLink="/login">Sign in →</a>
+        <span class="link-line"></span>
       </div>
     </form>
+
+    <div class="card-footer-data">
+      <span>SYS::NEW_USER</span>
+      <span>|</span>
+      <span>PROTOCOL::SECURE</span>
+      <span>|</span>
+      <span class="blink">▶ READY</span>
+    </div>
   </div>
 </div>

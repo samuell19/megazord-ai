@@ -1,266 +1,325 @@
+$cyan: #00ffff;
+$cyan-dim: rgba(0, 255, 255, 0.3);
+$cyan-glow: rgba(0, 255, 255, 0.15);
+$dark-bg: #000a14;
+$panel-bg: rgba(0, 20, 40, 0.85);
+
 .agent-sessions-container {
   min-height: 100vh;
-  background: #000;
+  background: $dark-bg;
   display: flex;
   flex-direction: column;
+  position: relative;
+  font-family: 'Courier New', monospace;
 }
 
-.agent-header {
-  background: rgba(0, 20, 40, 0.9);
-  border-bottom: 1px solid #00ffff;
-  padding: 20px 40px;
-
-  .header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    .btn-back, .btn-delete {
-      padding: 8px 16px;
-      background: transparent;
-      border: 1px solid rgba(0, 255, 255, 0.5);
-      border-radius: 2px;
-      color: #00ffff;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-
-      &:hover {
-        border-color: #00ffff;
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-      }
-    }
-
-    .btn-delete {
-      border-color: rgba(255, 0, 85, 0.5);
-      color: #ff0055;
-
-      &:hover {
-        border-color: #ff0055;
-        box-shadow: 0 0 10px rgba(255, 0, 85, 0.3);
-      }
-    }
-
-    .agent-info {
-      flex: 1;
-      text-align: center;
-
-      h1 {
-        color: #fff;
-        font-size: 20px;
-        margin: 0 0 5px 0;
-      }
-
-      .model {
-        color: #00ffff;
-        font-size: 12px;
-        font-family: 'Courier New', monospace;
-      }
-    }
+/* ── HUD BACKGROUND ── */
+.hud-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  .grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridShift 20s linear infinite;
+  }
+  .scan-line {
+    position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, $cyan-dim, transparent);
+    animation: scanDown 6s linear infinite;
   }
 }
 
+.particle {
+  position: fixed; width: 3px; height: 3px; border-radius: 50%;
+  background: $cyan; opacity: 0; z-index: 0; pointer-events: none;
+  animation: particleFloat 8s ease-in-out infinite;
+  &.p1 { top: 8%; left: 12%; animation-delay: 0s; }
+  &.p2 { top: 20%; left: 85%; animation-delay: 1.2s; }
+  &.p3 { top: 55%; left: 8%; animation-delay: 2.4s; }
+  &.p4 { top: 70%; left: 92%; animation-delay: 3.6s; }
+  &.p5 { top: 35%; left: 50%; animation-delay: 1.8s; }
+  &.p6 { top: 80%; left: 30%; animation-delay: 4.8s; }
+  &.p7 { top: 45%; left: 75%; animation-delay: 5.5s; }
+  &.p8 { top: 15%; left: 40%; animation-delay: 6.2s; }
+}
+
+/* ── HUD FRAME ── */
+.hud-frame {
+  position: fixed; inset: 12px; z-index: 0; pointer-events: none;
+  .corner {
+    position: absolute; width: 30px; height: 30px;
+    &.tl { top: 0; left: 0; border-top: 2px solid $cyan-dim; border-left: 2px solid $cyan-dim; }
+    &.tr { top: 0; right: 0; border-top: 2px solid $cyan-dim; border-right: 2px solid $cyan-dim; }
+    &.bl { bottom: 0; left: 0; border-bottom: 2px solid $cyan-dim; border-left: 2px solid $cyan-dim; }
+    &.br { bottom: 0; right: 0; border-bottom: 2px solid $cyan-dim; border-right: 2px solid $cyan-dim; }
+  }
+}
+
+/* ── AGENT HEADER ── */
+.agent-header {
+  background: $panel-bg;
+  border-bottom: 1px solid $cyan-dim;
+  padding: 20px 40px 0;
+  position: relative; z-index: 1;
+  backdrop-filter: blur(6px);
+
+  .header-content {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 16px;
+  }
+
+  .btn-back, .btn-delete {
+    padding: 8px 18px; background: transparent;
+    border: 1px solid $cyan-dim;
+    color: $cyan; font-size: 11px; letter-spacing: 2px;
+    cursor: pointer; transition: all 0.3s ease;
+    font-family: 'Courier New', monospace;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    display: flex; align-items: center; gap: 6px;
+
+    &:hover { border-color: $cyan; box-shadow: 0 0 12px $cyan-glow; text-shadow: 0 0 6px $cyan; }
+    .btn-arrow { font-size: 12px; }
+  }
+
+  .btn-delete {
+    border-color: rgba(255,51,102,0.3); color: #ff3366;
+    .btn-x { font-size: 12px; }
+    &:hover { border-color: #ff3366; box-shadow: 0 0 12px rgba(255,51,102,0.2); text-shadow: 0 0 6px #ff3366; }
+  }
+
+  .agent-info {
+    flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px;
+
+    h1 { color: #fff; font-size: 20px; margin: 0; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.1); }
+    .model-badge {
+      display: inline-block; padding: 3px 12px;
+      background: rgba(0,255,255,0.06); border: 1px solid $cyan-dim;
+      color: $cyan; font-size: 10px; letter-spacing: 2px;
+    }
+  }
+
+  /* Avatar ring */
+  .agent-avatar-ring {
+    width: 48px; height: 48px; position: relative;
+    .avatar-ring {
+      position: absolute; inset: 0; border-radius: 50%; border: 1px solid $cyan-dim;
+      &.r1 { animation: ringPulse 2.5s ease-out infinite; }
+      &.r2 { inset: 6px; animation: ringPulse 2.5s ease-out 0.4s infinite; }
+    }
+    .avatar-sweep {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0%, $cyan-glow 15%, transparent 20%);
+      animation: radarSweep 3s linear infinite;
+    }
+    .avatar-icon {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; filter: drop-shadow(0 0 4px $cyan);
+    }
+  }
+
+  .header-data-strip {
+    display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;
+    padding: 8px 0; border-top: 1px solid rgba(0,255,255,0.06);
+    font-size: 9px; color: rgba(0,255,255,0.3); letter-spacing: 2px;
+    .status-online { color: rgba(0,255,128,0.6); }
+    .blink { animation: blink 1.2s step-end infinite; color: rgba(0,255,128,0.5); }
+  }
+}
+
+/* ── CONTENT ── */
 .sessions-content {
-  flex: 1;
-  max-width: 1400px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 40px;
+  flex: 1; max-width: 1400px; width: 100%;
+  margin: 0 auto; padding: 40px;
+  position: relative; z-index: 1;
 }
 
 .sessions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
 
-  h2 {
-    color: #fff;
-    font-size: 24px;
-    margin: 0;
+  .section-title {
+    display: flex; align-items: center; gap: 10px;
+    .title-marker { color: $cyan; font-size: 14px; }
+    h2 { color: #fff; font-size: 20px; margin: 0; letter-spacing: 3px; }
+    .title-line { width: 60px; height: 1px; background: linear-gradient(90deg, $cyan-dim, transparent); }
   }
 
   .btn-new-session {
-    padding: 12px 24px;
-    background: transparent;
-    border: 2px solid #00ffff;
-    border-radius: 2px;
-    color: #00ffff;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    padding: 12px 24px; background: transparent;
+    border: 1px solid $cyan; color: $cyan;
+    font-size: 12px; font-weight: 600; letter-spacing: 2px;
+    cursor: pointer; transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'Courier New', monospace;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
 
-    .icon {
-      font-size: 18px;
-      line-height: 1;
-    }
+    .icon { font-size: 14px; }
 
     &:hover {
-      background: rgba(0, 255, 255, 0.1);
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+      background: $cyan-glow;
+      box-shadow: 0 0 20px rgba(0,255,255,0.15);
+      text-shadow: 0 0 6px $cyan;
     }
   }
 }
 
 .error-banner {
-  background: rgba(255, 0, 85, 0.1);
-  border: 1px solid rgba(255, 0, 85, 0.3);
-  color: #ff0055;
-  padding: 12px 20px;
-  border-radius: 4px;
-  margin-bottom: 20px;
-  font-size: 12px;
+  background: rgba(255,51,102,0.06);
+  border: 1px solid rgba(255,51,102,0.2);
+  color: #ff3366; padding: 12px 20px;
+  margin-bottom: 20px; font-size: 12px; letter-spacing: 1px;
 }
 
+/* ── SESSIONS GRID ── */
 .sessions-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 20px;
 
   .empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 20px;
+    grid-column: 1 / -1; text-align: center; padding: 80px 20px;
 
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 20px;
-      opacity: 0.3;
+    .empty-rings {
+      width: 100px; height: 100px; margin: 0 auto 20px; position: relative;
+      .e-ring {
+        position: absolute; inset: 0; border-radius: 50%; border: 1px solid $cyan-dim;
+        &.r1 { animation: ringPulse 3s ease-out infinite; }
+        &.r2 { inset: 12px; animation: ringPulse 3s ease-out 0.5s infinite; }
+        &.r3 { inset: 24px; animation: ringPulse 3s ease-out 1s infinite; }
+      }
+      .empty-icon {
+        position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+        font-size: 32px; opacity: 0.5;
+      }
     }
 
-    p {
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 18px;
-      margin: 0 0 8px 0;
-    }
-
-    span {
-      color: rgba(255, 255, 255, 0.4);
-      font-size: 14px;
-    }
+    p { color: rgba(255,255,255,0.5); font-size: 16px; margin: 0 0 8px 0; letter-spacing: 2px; }
+    .empty-sub { color: rgba(255,255,255,0.3); font-size: 12px; letter-spacing: 1px; }
   }
 
   .session-card {
-    background: rgba(0, 20, 40, 0.6);
-    border: 1px solid rgba(0, 255, 255, 0.2);
-    border-radius: 4px;
-    padding: 24px;
-    cursor: pointer;
+    background: $panel-bg;
+    border: 1px solid rgba(0,255,255,0.1);
+    padding: 24px; cursor: pointer;
     transition: all 0.3s ease;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    position: relative; display: flex; flex-direction: column; gap: 16px;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    animation: cardFadeIn 0.5s ease-out both;
+    overflow: hidden;
+
+    .card-glow {
+      position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+      background: radial-gradient(ellipse at center, rgba(0,255,255,0.03) 0%, transparent 60%);
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .card-border-anim {
+      position: absolute; inset: 0; border: 1px solid transparent;
+      transition: border-color 0.3s;
+    }
 
     &:hover {
-      border-color: rgba(0, 255, 255, 0.5);
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      border-color: $cyan-dim;
+      box-shadow: 0 0 25px rgba(0,255,255,0.08);
       transform: translateY(-2px);
-
-      .btn-delete-session {
-        opacity: 1;
-      }
+      .card-glow { opacity: 1; }
+      .card-border-anim { border-color: rgba(0,255,255,0.06); }
+      .btn-delete-session { opacity: 1; }
     }
 
-    .session-emoji {
-      font-size: 48px;
-      line-height: 1;
-    }
+    .session-emoji { font-size: 42px; line-height: 1; position: relative; z-index: 1; }
 
     .session-info {
-      flex: 1;
+      flex: 1; position: relative; z-index: 1;
 
       h3 {
-        color: #fff;
-        font-size: 18px;
-        margin: 0 0 8px 0;
-        font-weight: 600;
+        color: #e0f7ff; font-size: 16px; margin: 0 0 8px 0;
+        font-weight: 600; letter-spacing: 1px;
       }
 
       p {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 14px;
-        line-height: 1.5;
+        color: rgba(255,255,255,0.5); font-size: 13px; line-height: 1.5;
         margin: 0 0 12px 0;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-
-        &.no-description {
-          color: rgba(255, 255, 255, 0.4);
-          font-style: italic;
-        }
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        &.no-description { color: rgba(255,255,255,0.25); font-style: italic; }
       }
 
       .session-meta {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-
-        .date {
-          color: rgba(0, 255, 255, 0.6);
-          font-size: 11px;
-          font-family: 'Courier New', monospace;
+        display: flex; align-items: center; gap: 8px;
+        .meta-dot {
+          width: 4px; height: 4px; border-radius: 50%;
+          background: rgba(0,255,128,0.5);
+          box-shadow: 0 0 4px rgba(0,255,128,0.3);
         }
+        .date { color: rgba(0,255,255,0.5); font-size: 11px; letter-spacing: 1px; }
       }
     }
 
     .btn-delete-session {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 32px;
-      height: 32px;
-      padding: 0;
-      background: rgba(0, 0, 0, 0.8);
-      border: 1px solid rgba(255, 0, 85, 0.3);
-      border-radius: 2px;
-      color: #ff0055;
-      font-size: 20px;
-      line-height: 1;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      opacity: 0;
+      position: absolute; top: 12px; right: 12px;
+      width: 30px; height: 30px; padding: 0;
+      background: rgba(0,0,0,0.6); border: 1px solid rgba(255,51,102,0.2);
+      color: #ff3366; font-size: 14px; line-height: 1;
+      cursor: pointer; transition: all 0.2s ease; opacity: 0; z-index: 2;
 
       &:hover {
-        background: rgba(255, 0, 85, 0.2);
-        border-color: #ff0055;
+        background: rgba(255,51,102,0.15);
+        border-color: #ff3366;
         opacity: 1 !important;
       }
     }
   }
 }
 
+/* ── LOADING STATE ── */
 .loading-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  padding: 80px 20px;
-  color: #00ffff;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 20px; padding: 80px 20px;
 
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(0, 255, 255, 0.2);
-    border-top-color: #00ffff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  .loader-core {
+    width: 60px; height: 60px; position: relative;
+    .l-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 1px solid transparent; border-top-color: $cyan;
+      &.r1 { animation: spin 1.5s linear infinite; }
+      &.r2 { inset: 8px; border-top-color: rgba(0,255,255,0.4); animation: spin 2s linear infinite reverse; }
+      &.r3 { inset: 16px; border-top-color: rgba(0,255,255,0.2); animation: spin 2.5s linear infinite; }
+    }
+    .l-icon {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      color: $cyan; font-size: 14px;
+    }
   }
 
-  span {
-    font-size: 14px;
+  .loading-text {
+    color: $cyan-dim; font-size: 12px; letter-spacing: 3px;
+    animation: textFlicker 2s infinite;
   }
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* ── ANIMATIONS ── */
+@keyframes gridShift { 0% { background-position: 0 0; } 100% { background-position: 60px 60px; } }
+@keyframes scanDown { 0% { top: -2px; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+@keyframes particleFloat {
+  0%, 100% { opacity: 0; transform: translateY(0) scale(0.5); }
+  50% { opacity: 0.6; transform: translateY(-30px) scale(1); }
+}
+@keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes ringPulse { 0% { transform: scale(1); opacity: 0.5; } 100% { transform: scale(1.3); opacity: 0; } }
+@keyframes textFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@keyframes cardFadeIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .agent-header { padding: 16px 20px 0; }
+  .agent-header .header-content {
+    flex-direction: column; gap: 12px;
+    .btn-back, .btn-delete { align-self: stretch; justify-content: center; }
+  }
+  .sessions-content { padding: 20px; }
+  .sessions-header { flex-direction: column; gap: 16px; align-items: flex-start; }
+  .sessions-grid { grid-template-columns: 1fr; }
 }
